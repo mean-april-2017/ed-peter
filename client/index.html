@@ -1,16 +1,97 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="simonApp">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="/angular.js" type="text/javascript"></script>
     <script src="/app.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css">
     <title>Simon</title>
+    <script>
+        var Simon = angular.module('simonApp',[]);
+        Simon.controller('SimonController', ['$scope', function($scope){
+            $scope.gameLog = []; //initialize game
+            $scope.currentGameEntry = [];
+            $scope.currPlayer = 'Player 1';
+            $scope.p1score = 0;
+            $scope.p2score = 0;
+            var i = 0;
+            $scope.addColor = function(color){
+                $scope.currentGameEntry.push(color); //add clicked color to array
+                if ($scope.gameLog.length == 0){ // a 1-time function to flip players & start arrays for first move
+                    $scope.gameLog.push($scope.currentGameEntry[0]);
+                    $scope.currentGameEntry = [];
+                    $scope.currPlayer = 'Player 2';
+                    alert("First flip to P2");
+                }
+                else{ //this triggers if it's not the first turn'
+                    console.log('current game entry=', $scope.currentGameEntry[i], i)
+                    console.log('gamelog[i]=', $scope.gameLog[i], i) //
+                    if($scope.currentGameEntry.length <= $scope.gameLog.length){
+                        if($scope.currentGameEntry[i] != $scope.gameLog[i]){ // checks for position to see if they dead
+                            alert("You dead. Not a match. Winning sequence: " + $scope.gameLog)
+                            $scope.gameLog = [];
+                            $scope.currentGameEntry = [];
+                            if ($scope.currPlayer == "Player 1"){
+                                $scope.p2score += 1;
+                            }
+                            else{
+                                $scope.currPlayer = "Player 1";
+                                $scope.p1score += 1;
+                            }
+                        }
+                        i += 1;
+                    }
+                    else{
+                        if($scope.currentGameEntry.length == ($scope.gameLog.length + 1)){
+                            if ($scope.currPlayer == 'Player 1'){
+                                $scope.currPlayer = 'Player 2';
+                                $scope.gameLog = $scope.currentGameEntry;
+                                $scope.currentGameEntry = [];
+                                alert("Player 2's turn'")
+                                i = 0;
+                            }
+                            else{
+                                $scope.currPlayer = 'Player 1';
+                                $scope.gameLog = $scope.currentGameEntry;
+                        
+                                console.log($scope.gameLog);
+                                $scope.currentGameEntry = [];
+                                alert("Player 1's turn'")
+                                i = 0;
+                            }
+                        }
+                    }
+                    }
+                }
+            }])
+    </script>
 </head>
 <body>
-
-    <h1>Simon</h1>
-
+    <div ng-controller="SimonController">
+        <h1>Simon</h1>
+        <div id="currentplayer">
+            {{ currPlayer }} <br>
+            <!--Game Log: {{ gameLog }} <br>
+            Current Log: {{ currentGameEntry }}<br>
+            -->
+        </div>
+        <div id="biggameboard">
+            <div class="gameboard">
+                <div id="red" class="highlighted" ng-style="myStyle" ng-click="addColor('red')"></div>
+                <div id="green" ng-style="myStyle" ng-click="addColor('green')"></div>
+            </div>
+            <div class="gameboard">
+                <div id="blue" ng-style="myStyle" ng-click="addColor('blue')"></div>
+                <div id="purple" ng-style="myStyle" ng-click="addColor('purple')"></div>
+            </div>
+        </div>
+        <div id="scores">
+            Player 1 Wins: {{ p1score }} <br>
+            Player 2 Wins: {{ p2score }}
+        </div>
+    </div>
 </body>
 </html>
